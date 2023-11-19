@@ -1,5 +1,6 @@
 /// Modified from FastLEDs example ColorPalette.ino
 
+//Move teh 'FastLED' folder to your 'Arduino/libraries' folder
 #include <FastLED.h>
 
 #define LED_PIN     6
