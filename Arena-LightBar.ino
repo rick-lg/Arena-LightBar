@@ -1,6 +1,6 @@
 /// Modified from FastLEDs example ColorPalette.ino
 
-//Move teh 'FastLED' folder to your 'Arduino/libraries' folder
+//Move the 'FastLED' folder to your 'Arduino/libraries' folder
 #include <FastLED.h>
 
 #define LED_PIN     6
@@ -51,11 +51,15 @@ static uint8_t startIndex = 255/3;
 void ISR_blue_button_pressed(void) 
 {
     startIndex++;
+    startIndex++;
+    delay(100);
 }
 
 void ISR_red_button_pressed(void) 
 {
     startIndex--;
+    startIndex--;
+    delay(100);
 }
 
 
@@ -68,7 +72,7 @@ void loop()
     Serial.println("Here is the loop");
    // ChangePalettePeriodically();
 
-    AreanaLEDs(255, 255);
+    ArenaLEDs(255, 255);
     
     /*if(ping_pong){
       startIndex = startIndex + 1; 
@@ -114,7 +118,7 @@ void ButtonISR(){
   
 }
 
-void AreanaLEDs(int red, int blue){
+void ArenaLEDs(int red, int blue){
  #define SPREAD_COUNT (16)
     
     currentBlending = NOBLEND;
