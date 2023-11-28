@@ -4,23 +4,16 @@
 #include <FastLED.h>
 
 #define LED_PIN     6
-#define NUM_LEDS    50
+#define NUM_LEDS    30
 //255 max bright
 #define BRIGHTNESS  127
 #define LED_TYPE    WS2812
 #define COLOR_ORDER GRB
 CRGB leds[NUM_LEDS];
 
-//#define UPDATES_PER_SECOND 100
-#define UPDATES_PER_SECOND 200
+#define YELLOW_LED_WIDTH (3)
 
-CRGBPalette16 currentPalette;
-TBlendType    currentBlending;
-
-extern CRGBPalette16 myRedWhiteBluePalette;
-extern const TProgmemPalette16 myRedWhiteBluePalette_p PROGMEM;
-
-
+#define UPDATES_PER_SECOND 30
 
 #define JUDGE0_BLUE_BUTTON (2)
 #define JUDGE0_RED_BUTTON (3)
@@ -46,97 +39,54 @@ void setup() {
 
 }
 
-static uint8_t startIndex = 255/3;
+static uint8_t startIndex = NUM_LEDS/2;
+
+void incrementStartIndex(){
+    startIndex++;
+    startIndex = (startIndex>NUM_LEDS)?NUM_LEDS-1:startIndex;
+  
+}
+void decrementStartIndex(){  
+    startIndex--;
+    startIndex = (startIndex<0)?0:startIndex;
+}
 
 void ISR_blue_button_pressed(void) 
 {
-    startIndex++;
-    startIndex++;
-    delay(100);
+    incrementStartIndex();
+    delay(50);
 }
 
 void ISR_red_button_pressed(void) 
 {
-    startIndex--;
-    startIndex--;
-    delay(100);
+    decrementStartIndex();
+    delay(50);
 }
 
-
-bool ping_pong = true;
 void loop()
 {
+    
+  for(int i = 0; i < startIndex; i++) { 
+     leds[i] = CRGB::Blue;
+  } 
   
-    
-    
-    Serial.println("Here is the loop");
-   // ChangePalettePeriodically();
-
-    ArenaLEDs(255, 255);
-    
-    /*if(ping_pong){
-      startIndex = startIndex + 1; 
-      if(startIndex > 127){
-        ping_pong = false;
-      }
-    }else{
-      startIndex--;
-      if(startIndex == 30){
-        ping_pong = true;
-      }
-    }*/
-    FillLEDsFromPaletteColors( startIndex);
-    
-    FastLED.show();
-    FastLED.delay(1000 / UPDATES_PER_SECOND);
-}
-
-//When a button is pressed, register it here
-/*
-#define NUMBER_OF_JUDGES (3)
-uint8_t blue[NUMBER_OF_JUDGES];
-uint8_t red [NUMBER_OF_JUDGES];
-struct JUDGE_BUTTON{
-  int pin;
-  int mask;
-  int state;
-  int count;
-}
-
-JUDGE_BUTTON judge_blue[NUMBER_OF_JUDGES];
-JUDGE_BUTTON judge_red [NUMBER_OF_JUDGES];
-
-void JudgeButton_Init(){
-  for(int i = 0; i < NUMBER_OF_JUDGES; i++){
-    judge_blue[i];
-    judge_red[i];
+  for(int i = 0; i < YELLOW_LED_WIDTH; i++){
+    leds[startIndex+i] = CRGB::Yellow;
+  }  
+  
+  for(int i = startIndex+YELLOW_LED_WIDTH; i < NUM_LEDS; i++) { 
+    leds[i] = CRGB::Red;
+  } 
+  FastLED.show(); 
+  
+  if(digitalRead(JUDGE0_BLUE_BUTTON) == LOW){
+    incrementStartIndex();
   }
-}*/
+  if(digitalRead(JUDGE0_RED_BUTTON) == LOW){
+    decrementStartIndex();
+  }
 
-void ButtonISR(){
-
-  
-}
-
-void ArenaLEDs(int red, int blue){
- #define SPREAD_COUNT (16)
+  FastLED.delay(1000 / UPDATES_PER_SECOND);
     
-    currentBlending = NOBLEND;
-    fill_solid( currentPalette, SPREAD_COUNT, CRGB::Blue);
-    // and set every fourth one to white.
-    for(int i = 0; i < SPREAD_COUNT/2; i++){      
-        currentPalette[i] = CRGB::Red;
-    }
-        currentPalette[SPREAD_COUNT/2] = CRGB::Yellow;
 }
-
-
-void FillLEDsFromPaletteColors( uint8_t colorIndex)
-{
-    uint8_t brightness = BRIGHTNESS;
     
-    for( int i = 0; i < NUM_LEDS; ++i) {
-        leds[i] = ColorFromPalette( currentPalette, colorIndex, brightness, currentBlending);
-        colorIndex += 3;
-    }
-}
