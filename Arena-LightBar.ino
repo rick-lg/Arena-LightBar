@@ -4,14 +4,14 @@
 #include <FastLED.h>
 
 #define LED_PIN     6
-#define NUM_LEDS    30
+#define NUM_LEDS    35
 //255 max bright
-#define BRIGHTNESS  127
+#define BRIGHTNESS  (127/2)
 #define LED_TYPE    WS2812
 #define COLOR_ORDER GRB
 CRGB leds[NUM_LEDS];
 
-#define YELLOW_LED_WIDTH (3)
+#define YELLOW_LED_WIDTH (1)
 
 #define UPDATES_PER_SECOND 30
 
@@ -19,14 +19,19 @@ CRGB leds[NUM_LEDS];
 #define JUDGE0_RED_BUTTON (3)
 
 
+unsigned long lastDebounceTime = 0;  // the last time the output pin was toggled
+unsigned long debounceDelay = 250;    // the debounce time; increase if the output flickers
+
 void setup() {
     Serial.begin(115200);
     pinMode(LED_BUILTIN, OUTPUT);
-    digitalWrite(LED_BUILTIN, HIGH);
 
 
     pinMode(JUDGE0_BLUE_BUTTON, INPUT_PULLUP);
     pinMode(JUDGE0_RED_BUTTON, INPUT_PULLUP);
+    
+    digitalWrite(JUDGE0_BLUE_BUTTON, HIGH);
+    digitalWrite(JUDGE0_RED_BUTTON, HIGH);
 
    for(int i = 0; i < NUM_LEDS; i++) { 
       leds[i] = CRGB::White;
@@ -42,9 +47,11 @@ void setup() {
      
     FastLED.show();
     FastLED.delay(1000); 
+
+    lastDebounceTime = millis();
 }
 
-static uint8_t startIndex = NUM_LEDS/2;
+static uint8_t startIndex = (NUM_LEDS/2);
 
 void incrementStartIndex(){
     startIndex++;
@@ -56,16 +63,21 @@ void decrementStartIndex(){
     startIndex = (startIndex<=0)?1:startIndex;
 }
 
+
 void ISR_blue_button_pressed(void) 
 {
-    incrementStartIndex();
-    delay(50);
+  if ((millis() - lastDebounceTime) > debounceDelay) {
+    incrementStartIndex();    
+    lastDebounceTime = millis();
+  }
 }
 
 void ISR_red_button_pressed(void) 
 {
+  if ((millis() - lastDebounceTime) > debounceDelay) {
     decrementStartIndex();
-    delay(50);
+    lastDebounceTime = millis();
+  }
 }
 
 bool flip = false;
@@ -104,13 +116,13 @@ void loop()
       leds[i] = CRGB::Red;
     } 
     FastLED.show(); 
-    
+    /*
     if(digitalRead(JUDGE0_BLUE_BUTTON) == LOW){
       incrementStartIndex();
     }
     if(digitalRead(JUDGE0_RED_BUTTON) == LOW){
       decrementStartIndex();
-    }
+    }*/
     FastLED.delay(1000 / UPDATES_PER_SECOND);
     
     }  
