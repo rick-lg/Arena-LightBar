@@ -4,6 +4,10 @@
 #include <FastLED.h>
 
 #define LED_PIN     6
+#define JUDGE0_BLUE_BUTTON (2)
+#define JUDGE0_RED_BUTTON (3)
+
+
 #define NUM_LEDS    35
 //255 max bright
 #define BRIGHTNESS  (127/2)
@@ -11,12 +15,9 @@
 #define COLOR_ORDER GRB
 CRGB leds[NUM_LEDS];
 
-#define YELLOW_LED_WIDTH (1)
-
+#define YELLOW_LED_WIDTH (3)
 #define UPDATES_PER_SECOND 30
 
-#define JUDGE0_BLUE_BUTTON (2)
-#define JUDGE0_RED_BUTTON (3)
 
 
 unsigned long lastDebounceTime = 0;  // the last time the output pin was toggled
@@ -51,7 +52,7 @@ void setup() {
     lastDebounceTime = millis();
 }
 
-static uint8_t startIndex = (NUM_LEDS/2);
+static uint8_t startIndex = (NUM_LEDS/2) - (YELLOW_LED_WIDTH/2);
 
 void incrementStartIndex(){
     startIndex++;
