@@ -28,7 +28,10 @@ void setup() {
     pinMode(JUDGE0_BLUE_BUTTON, INPUT_PULLUP);
     pinMode(JUDGE0_RED_BUTTON, INPUT_PULLUP);
 
-
+   for(int i = 0; i < NUM_LEDS; i++) { 
+      leds[i] = CRGB::White;
+    }
+    
     Serial.println("Here is the start");
     delay( 2000 ); // power-up safety delay
     FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
@@ -36,7 +39,9 @@ void setup() {
     
     attachInterrupt(digitalPinToInterrupt(JUDGE0_BLUE_BUTTON), ISR_blue_button_pressed, FALLING);
     attachInterrupt(digitalPinToInterrupt(JUDGE0_RED_BUTTON), ISR_red_button_pressed, FALLING);
-
+     
+    FastLED.show();
+    FastLED.delay(1000); 
 }
 
 static uint8_t startIndex = NUM_LEDS/2;
